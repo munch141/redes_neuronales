@@ -12,10 +12,10 @@ def convergencia(costos):
     plt.subplots_adjust(0.14)
     plt.savefig("convergencia.png")
 
-def grafica(par, clasificacion, archivo="grafica.png"):
+def graficar_circulo(data, archivo="plots/grafica.png"):
     circulo = []
     resto = []
-    for p, c in zip(par, clasificacion):
+    for p, c in data:
         if c == 1:
             circulo.append(p)
         else:
