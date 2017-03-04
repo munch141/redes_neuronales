@@ -22,6 +22,7 @@ class Network(object):
     def feedforward(self, a):
         """
         Devuelve la salida de la red para un vector de entrada 'a'.
+        
         a : vector con los valores de entrada.
         """
         for b, w in zip(self.weights, self.biases):
@@ -35,6 +36,7 @@ class Network(object):
         cada lote. Termina cuando se hayan terminado todas las épocas. Una época
         termina cuando se aplica el descenso del gradiente estocástico a todos
         los lotes del conjunto de entrenamiento.
+        
         training_data : arreglo de tuplas de forma (x,y) donde 'x' es un vector
                         con los valores de entrada y 'y' es el índice de la
                         neurona con el mayor valor de activación.
@@ -55,8 +57,21 @@ class Network(object):
             print "Época {0} completada".format(j)
 
     def update_mini_batch(self, mini_batch, alpha):
+        """
+        Actualiza los pesos y las tendencias (bias) de la red para aplicando
+        backpropagation a los ejemplos de un lote. Para cada ejemplo se aplica
+        backpropagation para obtener los vectores de error y activación de cada
+        capa y los resultados se van sumando en 'nabla_w' y 'nabla_b'. Después
+        de calcular esto, se actualizan los vectores de peso y bias.
+
+        mini_batch : conjunto de ejemplos para calcular las actualizaciones.
+        alpha : tasa de aprendizaje.
+        """
+        # vector para guardar la sumatoria del producto de los errores 'delta' y
+        # las activaciones 'a' para cada capa
         nabla_b = [np.zeros(b.shape) for b in self.biases]
-        nabla_w = [np.zeros(w.shape) for b in self.weights]
+        # vector para guardar la sumatoria de los errores 'delta' en cada capa
+        nabla_w = [np.zeros(w.shape) for w in self.weights]
         for x, y in mini_batch:
             delta_nabla_b, delta_nabla_w = self.backprop(x, y)
             nabla_b = [nb+dnb for nb, dnb in zip(nabla_b, delta_nabla_b)]
@@ -67,6 +82,9 @@ class Network(object):
                         for w, nw in zip(self.weights, nabla_w)]
 
     def backprop(self, x, y):
+        """
+        Implementación de backpropagation.
+        """
         nabla_b = [np.zeros(b.shape) for b in self.biases]
         nabla_w = [np.zeros(w.shape) for w in self.weights]
 
