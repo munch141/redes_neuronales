@@ -1,6 +1,16 @@
 import random
+from collections import namedtuple
 
 import numpy as np
+
+
+class Evaluacion():
+    def __init__(self, aciertos, fp, fn, clases):
+        self.aciertos = aciertos
+        self.fp = fp
+        self.fn = fn
+        self.clases = clases
+
 
 class Red(object):
     def __init__(self, sizes):
@@ -16,7 +26,7 @@ class Red(object):
         self.num_layers = len(sizes)
         self.sizes = sizes
         self.biases = [np.random.randn(y,1) for y in sizes[1:]]
-        self.weights = [np.random.randn(y, x)
+        self.weights = [np.random.randn(y, x)/np.sqrt(x)
                         for x, y in zip(sizes[:-1], sizes[1:])]
 
     def feedforward(self, a):
@@ -25,9 +35,23 @@ class Red(object):
         
         a : vector con los valores de entrada.
         """
-        for b, w in zip(self.weights, self.biases):
+        for w, b in zip(self.weights, self.biases):
             a = sigmoid(np.dot(w, a)+b)
         return a
+
+    def cost(self, y, a):
+        """
+        Costo de una instancia.
+        """
+        return np.linalg.norm(vectorized_result(y)-a)**2
+
+    def total_cost(self, data):
+        """
+        Costo total sobre data.
+        """
+        s = sum([self.cost(y, self.feedforward(x))
+                 for x, y in data])
+        return s / (2*len(data))
 
     def SGD(self, training_data, epochs, mini_batch_size, alpha):
         """
@@ -46,7 +70,8 @@ class Red(object):
         alpha : taza de aprendizaje.
 
         """
-        n = len(trainig_data)
+        n = len(training_data)
+        costos = []
         for j in xrange(epochs):
             random.shuffle(training_data)
             mini_batches = [
@@ -54,7 +79,9 @@ class Red(object):
                 for k in xrange(0, n, mini_batch_size)]
             for mini_batch in mini_batches:
                 self.update_mini_batch(mini_batch, alpha)
-            print "epoca {0} completada".format(j)
+            costos.append(self.total_cost(training_data))
+            #print "epoca {0} completada".format(j)
+        return costos
 
     def update_mini_batch(self, mini_batch, alpha):
         """
@@ -99,23 +126,36 @@ class Red(object):
 
         delta = self.cost_derivative(activations[-1], y) * sigmoid_prime(zs[-1])
         nabla_b[-1] = delta
-        nabla_w[-1] = np.dot(delta, activations[-2].transpose())
+        #nabla_w[-1] = np.dot(delta, activations[-2].transpose())
+        nabla_w[-1] = delta * activations[-2].transpose()
 
         for l in xrange(2, self.num_layers):
-            z = zs[-1]
+            z = zs[-l]
             sp = sigmoid_prime(z)
             delta = np.dot(self.weights[-l+1].transpose(), delta) * sp
-            nabla_b[-1] = delta
-            nabla_w[-1] = np.dot(delta, activations[-l-1].transpose())
+            nabla_b[-l] = delta
+            #nabla_w[-l] = np.dot(delta, activations[-l-1].transpose())
+            nabla_w[-l] = delta * activations[-l-1].transpose()
         return (nabla_b, nabla_w)
+
 
     def evaluate(self, test_data):
         test_results = [(np.argmax(self.feedforward(x)), y)
-                         for (x, y) in test_data]
+                        for (x, y) in test_data]
         return sum(int(x == y) for (x, y) in test_results)
 
+    def classify(self, data):
+        return [np.argmax(self.feedforward(x)) for x in data]
+
+    def classification_stats(self, data):
+        results = [(np.argmax(self.feedforward(x)), y) for (x, y) in data]
+        rights = sum(int(x == y) for (x, y) in results)
+        fp = sum(1 for (x, y) in results if int(x) == 1 and int(y) != 1)
+        fn =sum(1 for (x, y) in results if int(x) == 0 and int(y) != 0)
+        return Evaluacion(100.0*rights/len(data), fp, fn, [x for (x, y) in results])
+
     def cost_derivative(self, output_activations, y):
-        return (output_activations-y)
+        return (output_activations-vectorized_result(y))
 
 
 def sigmoid(z):
@@ -123,3 +163,8 @@ def sigmoid(z):
 
 def sigmoid_prime(z):
     return sigmoid(z)*(1-sigmoid(z))
+
+def vectorized_result(j):
+    e = np.zeros((2, 1))
+    e[j] = 1.0
+    return e
