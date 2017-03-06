@@ -53,7 +53,7 @@ splits = [50,60,70,80,90]
 
 ################################################################################
 
-file = open("resultados/e3/resultados_bin.txt", 'w')
+file = open("resultados/e3/resultados_bin.csv", 'w')
 for i, r in enumerate(redes):
     costos = []
     for s in splits:
@@ -71,7 +71,7 @@ file.close()
 ################################################################################
 ################################################################################
 
-file = open("resultados/e3/resultados_clas.txt", 'w')
+file = open("resultados/e3/resultados_clas.csv", 'w')
 for i, r in enumerate(redes):
     costos = []
     for s in splits:
