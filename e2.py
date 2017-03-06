@@ -78,19 +78,21 @@ r10 = Red([2, 10, 2])
 ct = generar_conjunto_prueba()
 
 train_sets = [c1, c2, c3, c4, c5, c6]
-redes = [r2, r3, r4, r5, r6, r7, r8, r9, r10]
+redes = [2, 3, 4, 5, 6, 7, 8, 9, 10]
 
 aciertos = []
 costos = [[],[],[],[],[],[],[],[],[]]
+clasificaciones = [[],[],[],[],[],[],[],[],[]]
 for i, train_data in enumerate(train_sets):
-    file = open("resultados/c"+str(i+1)+".csv", 'w')
+    file = open("resultados/e2/c"+str(i+1)+".csv", 'w')
     total_aciertos = 0
     for j, r in enumerate(redes):
-        costo = r.SGD(train_data, 400, len(train_data)/4, 2.0)
+        red = Red([2,r,2])
+        costo = red.SGD(train_data, 10, len(train_data)/4, 0.1)
         costos[j].append(costo)
-        train_eval = r.accuracy(train_data)
+        train_eval = red.accuracy(train_data)
         puntos = [np.array(p).reshape(2,1) for p in zip(*train_data)[0]]
-        res = r.classify(puntos)
+        res = red.classify(puntos)
         file.write(str(train_eval))
         file.write(",")
         file.write(str(falsos_positivos(res, zip(*train_data)[1])))
@@ -98,9 +100,10 @@ for i, train_data in enumerate(train_sets):
         file.write(str(falsos_negativos(res, zip(*train_data)[1])))
         file.write(",")        
 
-        test_eval = r.accuracy(ct)
+        test_eval = red.accuracy(ct)
         puntos = [np.array(p).reshape(2,1) for p in zip(*ct)[0]]
-        res = r.classify(puntos)
+        res = red.classify(puntos)
+        clasificaciones[j].append(res)
         file.write(str(test_eval))
         file.write(",")
         file.write(str(falsos_positivos(res, zip(*ct)[1])))
@@ -114,21 +117,14 @@ for i, train_data in enumerate(train_sets):
 
 index = aciertos.index(max(aciertos))
 best_train_data = train_sets[index]
-for i in range(len(costos)):
-    convergencia(costos[i][index])
-
-#graficar_circulo(zip(puntos, res))
-"""
-costos = r7.SGD(c6, 1000, len(c6)/4, 2.0)
+cs = []
+for c in costos:
+    cs.append(c[index])
+convergencia(cs, "plots/e2/convergencias.png")
 
 puntos = [np.array(p).reshape(2,1) for p in zip(*ct)[0]]
-res = r7.classify(puntos)
-graficar_circulo(zip(puntos, res))
-
-puntos = [np.array(p).reshape(2,1) for p in zip(*c6)[0]]
-res = r7.classify(puntos)
-graficar_circulo(zip(puntos, res))
-"""
+for i, c in enumerate(clasificaciones):
+    graficar_circulo(zip(puntos, c[index]), "plots/e2/red"+str(i+2)+".png")
 
 
 

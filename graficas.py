@@ -1,16 +1,18 @@
 import matplotlib.pyplot as plt
 
 def convergencia(costos, file):
-    iteraciones = [i for i in range(len(costos))]
+    iteraciones = range(len(costos[0]))
 
     f = plt.figure(1)
-    plt.plot(iteraciones, costos)
-    plt.title("Curvas de convergencia de la funcion de costo", fontsize = 14,
-              color = '0.90', verticalalignment = 'baseline', horizontalalignment = 'center')
+    for i, costo in enumerate(costos):
+        plt.plot(iteraciones, costo, label=str(i+2))
+    plt.title("Curvas de convergencia por numero de neuronas", fontsize = 14,
+              color = '0.5', verticalalignment = 'baseline', horizontalalignment = 'center')
     plt.xlabel("Iteracion", fontsize = 16, color = '0.50')
     plt.ylabel("Costo", fontsize = 16, color = '0.50')
-    plt.subplots_adjust(0.14)
-    plt.saveplot(file)
+    plt.legend()
+    plt.savefig(file)
+    plt.show()
 
 
 def graficar_circulo(data, archivo):
@@ -32,4 +34,5 @@ def graficar_circulo(data, archivo):
     plt.xlim(0, 20)
     plt.gca().set_aspect('equal', adjustable='box')
     plt.legend()
-    plt.saveplot(archivo)
+    plt.savefig(archivo)
+    plt.show()

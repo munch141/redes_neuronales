@@ -34,14 +34,24 @@ def bin_data(data):
     return zip(x, y)
 
 
+def split(data, percent):
+    p = percent*len(data)/100
+    return (data[:p], data[p:])
+
 data = cargar_datos("iris.data")
 b_data = bin_data(data)
 
-binarios = []
-clasificadores = []
-for i in range(4,11):
-    binarios.append(Red([4, i, 2]))
-    clasificadores.append(Red([4, i, 3]))
+redes = [4,5,6,7,8,9,10]
+
+################################################################################
+
+file = open("resutados/e3/resultados.txt")
+for r in redes:
+
+file.close()
+
+################################################################################
+################################################################################
 
 
-
+################################################################################
