@@ -35,7 +35,8 @@ class Red(object):
         """
         Costo de una instancia.
         """
-        return np.linalg.norm(vectorized_result(y)-a)**2
+        dim = np.shape(a)[0]
+        return np.linalg.norm(vectorized_result(y, dim)-a)**2
 
     def total_cost(self, data):
         """
@@ -72,7 +73,7 @@ class Red(object):
             for mini_batch in mini_batches:
                 self.update_mini_batch(mini_batch, alpha)
             costos.append(self.total_cost(training_data))
-            print "epoca {0} completada".format(j)
+            print "  epoca {0} completada".format(j)
         return costos
 
     def update_mini_batch(self, mini_batch, alpha):
@@ -133,14 +134,15 @@ class Red(object):
     def classify(self, data):
         return [np.argmax(self.feedforward(x)) for x in data]
 
-    def accuracy(self, test_data):
-        puntos = [np.array(p).reshape(2,1) for p in zip(*test_data)[0]]
+    def accuracy(self, test_data, dim):
+        puntos = [np.array(p).reshape(dim,1) for p in zip(*test_data)[0]]
         a = self.classify(puntos)
         y = zip(*test_data)[1]
         return 100.0*sum(1 for (x, y) in zip(a, y) if x == y)/len(puntos)
 
     def cost_derivative(self, output_activations, y):
-        return (output_activations-vectorized_result(y))
+        dim = np.shape(output_activations)[0]
+        return (output_activations-vectorized_result(y, dim))
 
 
 def sigmoid(z):
@@ -149,7 +151,7 @@ def sigmoid(z):
 def sigmoid_prime(z):
     return sigmoid(z)*(1-sigmoid(z))
 
-def vectorized_result(j):
-    e = np.zeros((2, 1))
+def vectorized_result(j, dim):
+    e = np.zeros((dim, 1))
     e[j] = 1.0
     return e

@@ -1,6 +1,6 @@
 import matplotlib.pyplot as plt
 
-def convergencia(costos, file):
+def convergencia_por_red(costos, file, show):
     iteraciones = range(len(costos[0]))
 
     f = plt.figure(1)
@@ -12,10 +12,29 @@ def convergencia(costos, file):
     plt.ylabel("Costo", fontsize = 16, color = '0.50')
     plt.legend()
     plt.savefig(file)
-    plt.show()
+    if show:
+        plt.show()
+    plt.gcf().clear()
 
 
-def graficar_circulo(data, archivo):
+def convergencia_por_conjunto(costos, splits, file, show, n):
+    iteraciones = range(len(costos[0]))
+
+    f = plt.figure(1)
+    for costo, s in zip(costos, splits):
+        plt.plot(iteraciones, costo, label=str(s)+"%")
+    plt.title("Curvas de convergencia por particion\nRed de {0} neuronas".format(n), fontsize = 14,
+              color = '0.5', verticalalignment = 'baseline', horizontalalignment = 'center')
+    plt.xlabel("Iteracion", fontsize = 16, color = '0.50')
+    plt.ylabel("Costo", fontsize = 16, color = '0.50')
+    plt.legend()
+    plt.savefig(file)
+    if show:
+        plt.show()
+    plt.gcf().clear()
+
+
+def graficar_circulo(data, archivo, show, n):
     circulo = []
     resto = []
     for p, c in data:
@@ -30,9 +49,13 @@ def graficar_circulo(data, archivo):
     if resto:
         x2, y2 = zip(*resto)
         plt.plot(x2, y2, 'co', markersize=1.5, label='rectangulo')
+    plt.title("Resultado de la clasificacion - Red de {0} neuronas".format(n), fontsize = 14,
+              color = '0.5', verticalalignment = 'baseline', horizontalalignment = 'center')
     plt.ylim(0, 20)
     plt.xlim(0, 20)
     plt.gca().set_aspect('equal', adjustable='box')
     plt.legend()
     plt.savefig(archivo)
-    plt.show()
+    if show:
+        plt.show()
+    plt.gcf().clear()
