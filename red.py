@@ -4,14 +4,6 @@ from collections import namedtuple
 import numpy as np
 
 
-class Evaluacion():
-    def __init__(self, aciertos, fp, fn, clases):
-        self.aciertos = aciertos
-        self.fp = fp
-        self.fn = fn
-        self.clases = clases
-
-
 class Red(object):
     def __init__(self, sizes):
         """
@@ -80,7 +72,7 @@ class Red(object):
             for mini_batch in mini_batches:
                 self.update_mini_batch(mini_batch, alpha)
             costos.append(self.total_cost(training_data))
-            #print "epoca {0} completada".format(j)
+            print "epoca {0} completada".format(j)
         return costos
 
     def update_mini_batch(self, mini_batch, alpha):
@@ -138,21 +130,14 @@ class Red(object):
             nabla_w[-l] = delta * activations[-l-1].transpose()
         return (nabla_b, nabla_w)
 
-
-    def evaluate(self, test_data):
-        test_results = [(np.argmax(self.feedforward(x)), y)
-                        for (x, y) in test_data]
-        return sum(int(x == y) for (x, y) in test_results)
-
     def classify(self, data):
         return [np.argmax(self.feedforward(x)) for x in data]
 
-    def classification_stats(self, data):
-        results = [(np.argmax(self.feedforward(x)), y) for (x, y) in data]
-        rights = sum(int(x == y) for (x, y) in results)
-        fp = sum(1 for (x, y) in results if int(x) == 1 and int(y) != 1)
-        fn =sum(1 for (x, y) in results if int(x) == 0 and int(y) != 0)
-        return Evaluacion(100.0*rights/len(data), fp, fn, [x for (x, y) in results])
+    def accuracy(self, test_data):
+        puntos = [np.array(p).reshape(2,1) for p in zip(*test_data)[0]]
+        a = self.classify(puntos)
+        y = zip(*test_data)[1]
+        return 100.0*sum(1 for (x, y) in zip(a, y) if x == y)/len(puntos)
 
     def cost_derivative(self, output_activations, y):
         return (output_activations-vectorized_result(y))

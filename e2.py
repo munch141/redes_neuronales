@@ -1,28 +1,8 @@
 import numpy as np
 
 from graficas import *
-from red import Red, Evaluacion
+from red import Red
 
-
-class Results():
-    def __init__(self, costs, train_eval, test_eval):
-        self.costs = costs
-        self.train_eval = train_eval
-        self.test_eval = test_eval
-
-    def write_to_file(self, fp):
-        fp.write(str(self.train_eval.aciertos))
-        fp.write("%, ")
-        fp.write(str(self.train_eval.fp))
-        fp.write(", ")
-        fp.write(str(self.train_eval.fn))
-        fp.write(", ")
-        fp.write(str(self.test_eval.aciertos))
-        fp.write("%, ")
-        fp.write(str(self.test_eval.fp))
-        fp.write(", ")
-        fp.write(str(self.test_eval.fn))
-        fp.write("\n")
 
 def cargar_datos(filename):
     x = []
@@ -69,34 +49,11 @@ def generar_conjunto_prueba():
     return zip(puntos, clases)
 
 
-def entrenar(red, train, epocas, mini_batch_size, alpha, \
-             test, outfile, outcostos, outtest, outclases):
-    costos = red.SGD(train, epocas, mini_batch_size, alpha)
-    train_e = red.evaluate(train)
-    test_e = red.evaluate(test)
-    salida = open(outfile, 'w')
-    # porcentaje de aciertos
-    salida.write(str(100.0*train_e[0]/len(train)))
-    salida.write(", ")
-    #falsos positivos
-    salida.write(str(train_e[1]))
-    salida.write(", ")
-    # falsos negativos
-    salida.write(str(train_e[2]))
-    salida.write(", ")
-    salida.write("\n")
-    # porcentaje de aciertos
-    salida.write(str(100.0*test_e[0]/len(test)))
-    salida.write(", ")
-    # falsos positivos
-    salida.write(str(test_e[1]))
-    salida.write(", ")
-    # falsos negativos
-    salida.write(str(test_e[2]))
-    salida.write("\n")
-    salida.close()
+def falsos_positivos(a, y):
+    return sum(1 for (i, j) in zip(a, y) if i == 1 and j != 1)
 
-
+def falsos_negativos(a, y):
+    return sum(1 for (i, j) in zip(a, y) if i == 0 and j != 0)
 
 ################################################################################
 ################################################################################
@@ -120,37 +77,58 @@ r10 = Red([2, 10, 2])
 
 ct = generar_conjunto_prueba()
 
-"""train_sets = [c1, c2, c3, c4, c5, c6]
+train_sets = [c1, c2, c3, c4, c5, c6]
 redes = [r2, r3, r4, r5, r6, r7, r8, r9, r10]
-resultados = {}
-for i, s in enumerate(train_sets):
-    file = "resultados/c"+str(i+1)+".csv"
-    fp = open(file, 'w')
-    for red in redes:
-        costos = red.SGD(s, 400, 100, 0.01)
-        train_eval = red.evaluate(s)
-        test_eval = red.evaluate(ct)
-        ident = (red.sizes[1], i)
-        resultados[ident] = Results(costos, train_eval, test_eval)
-        resultados[ident].write_to_file(fp)
 
+aciertos = []
+costos = [[],[],[],[],[],[],[],[],[]]
+for i, train_data in enumerate(train_sets):
+    file = open("resultados/c"+str(i+1)+".csv", 'w')
+    total_aciertos = 0
+    for j, r in enumerate(redes):
+        costo = r.SGD(train_data, 400, len(train_data)/4, 2.0)
+        costos[j].append(costo)
+        train_eval = r.accuracy(train_data)
+        puntos = [np.array(p).reshape(2,1) for p in zip(*train_data)[0]]
+        res = r.classify(puntos)
+        file.write(str(train_eval))
+        file.write(",")
+        file.write(str(falsos_positivos(res, zip(*train_data)[1])))
+        file.write(",")
+        file.write(str(falsos_negativos(res, zip(*train_data)[1])))
+        file.write(",")        
 
-        graficar_circulo(zip(ct, resultados[ident].test_eval.clases))
+        test_eval = r.accuracy(ct)
+        puntos = [np.array(p).reshape(2,1) for p in zip(*ct)[0]]
+        res = r.classify(puntos)
+        file.write(str(test_eval))
+        file.write(",")
+        file.write(str(falsos_positivos(res, zip(*ct)[1])))
+        file.write(",")
+        file.write(str(falsos_negativos(res, zip(*ct)[1])))
+        file.write("\n")
 
-    fp.close()
+        total_aciertos += test_eval
+    aciertos.append(total_aciertos)
+    file.close()
+
+index = aciertos.index(max(aciertos))
+best_train_data = train_sets[index]
+for i in range(len(costos)):
+    convergencia(costos[i][index])
+
+#graficar_circulo(zip(puntos, res))
 """
-costos = r3.SGD(c6, 400, 2000, 0.9)
-convergencia(costos)
-puntos = zip(*ct)[0]
-res = r3.classification(puntos)
-res2 = r3.evaluate(c6)
-rec = len([1 for (x,y) in c6 if y == 0])
-print "rectangulo: ", rec
-print "class rec : ", res2
+costos = r7.SGD(c6, 1000, len(c6)/4, 2.0)
+
+puntos = [np.array(p).reshape(2,1) for p in zip(*ct)[0]]
+res = r7.classify(puntos)
 graficar_circulo(zip(puntos, res))
 
-#epocas = 400
-#alpha = 0.01
+puntos = [np.array(p).reshape(2,1) for p in zip(*c6)[0]]
+res = r7.classify(puntos)
+graficar_circulo(zip(puntos, res))
+"""
 
 
 
