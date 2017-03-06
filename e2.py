@@ -1,3 +1,13 @@
+"""
+Proyecto 2 de Inteligencia Artificial 2.
+Enero-Marzo 2017.
+Hecho por:
+    Ricardo Munch.       Carnet: 11-10684.
+    Valentina Hernandez. Carnet: 10-10352.
+
+Este archivo contiene la implementacion del ejercicio 2 del proyecto.
+"""
+
 import numpy as np
 
 from graficas import *

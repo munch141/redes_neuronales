@@ -1,0 +1,20 @@
+Los programas están implementados y fueron probados en Python 2.7.10.
+Para correrlos se necesitan las librerías: numpy y matplotlib.
+
+La implementación de la red neuronal está en el archivo 'red.py'.
+
+La implementación del ejercicio 2 está en erchivo 'e2.py', para correrlo:
+
+    python e2.py
+
+La implementación del ejercicio 3 está en el archivo 'e3.py', para correrlo:
+
+    python e3.py
+
+
+En la carpeta 'plots/' están las gráficas que resultaron de los experimentos, ambos programas ('e2.py' y 'e3.py') guardan las gráficas producidas en esta carpeta.
+En la carpeta 'resultados/' están los resultados de los experimentos de ambos ejercicios.
+
+Hecho por:
+    Ricardo Münch.       Carnet: 11-10684.
+    Valentina Hernández. Carnet: 10-10352.

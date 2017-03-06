@@ -1,3 +1,15 @@
+"""
+Proyecto 2 de Inteligencia Artificial 2.
+Enero-Marzo 2017.
+Hecho por:
+    Ricardo Munch.       Carnet: 11-10684.
+    Valentina Hernandez. Carnet: 10-10352.
+
+Este archivo contiene la implementacion de la red neuronal, el algoritmo de
+entrenamiento es Descenso del Gradiente Estocastico, se usa la actualizacion
+por lotes.
+"""
+
 import random
 from collections import namedtuple
 
